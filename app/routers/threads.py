@@ -13,7 +13,6 @@ def get_threads(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 @router.get("/{thread_id}", response_model=schemas.Thread)
 def get_thread(thread_id: int, db: Session = Depends(get_db)):
     thread = db.query(models.Thread).filter(models.Thread.id == thread_id).first()
-    print(thread)
     if thread is None:
         raise HTTPException(status_code=404, detail="Thread not found")
     return thread

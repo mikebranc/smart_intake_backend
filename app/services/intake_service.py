@@ -56,7 +56,6 @@ def generate_form_input_class(db: Session) -> type[BaseModel]:
         
         # All fields are optional
         fields[snake_case_name] = (Optional[field_type], Field(description=description, default=None, **field_options))
-        print(f"Added field: {snake_case_name}, type: Optional[{field_type}]")
 
     return create_model(f"DynamicFormInput_{current_template.id}", **fields)
 
@@ -120,9 +119,6 @@ def setup_form_tool(db: Session, thread_id: Optional[int] = None) -> StructuredT
         return_direct=False,
         handle_tool_error=True,
     )
-    print(form_tool.args)
-    print(form_tool.name)
-    print(form_tool.description)
     return form_tool
 
 # Global variables for model and memory
@@ -133,22 +129,16 @@ system_prompt = "You are a helpful assistant named Steve required to complete in
 def get_agent_executor(db: Session, thread_id: Optional[int] = None):
 
     form_completer = setup_form_tool(db, thread_id)
-    print('args from function')
-    print(form_completer.args)
     tools = [form_completer]
     return create_react_agent(model, tools, state_modifier=system_prompt, checkpointer=memory)
 
 async def process_message(message: str, db: Session, thread_id: Optional[int] = None):
     config = {"configurable": {"thread_id": thread_id}} if thread_id else {}
-    print('config')
-    print(config)
     agent_executor = get_agent_executor(db, thread_id)
     response_chunks = []
     for chunk in agent_executor.stream(
         {"messages": [HumanMessage(content=message)]}, config
     ):
-        print('streaming response')
-        print(chunk)
         if isinstance(chunk, dict) and 'agent' in chunk:
             agent_message = chunk['agent']['messages'][0]
             if isinstance(agent_message.content, str):
