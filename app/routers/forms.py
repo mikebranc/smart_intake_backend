@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List
 from app import models, schemas
 from app.database import get_db
+from sqlalchemy import update
 
 router = APIRouter()
 
@@ -135,3 +136,20 @@ def delete_form_response(response_id: int, db: Session = Depends(get_db)):
     db.delete(db_response)
     db.commit()
     return db_response
+
+# @router.put("/templates/{template_id}/set-current", response_model=schemas.FormTemplate)
+# def set_current_form_template(template_id: int, set_current: schemas.SetCurrentTemplate, db: Session = Depends(get_db)):
+#     # Check if the template exists
+#     db_template = db.query(models.FormTemplate).filter(models.FormTemplate.id == template_id).first()
+#     if db_template is None:
+#         raise HTTPException(status_code=404, detail="Form template not found")
+
+#     # Set all templates to not current
+#     db.execute(update(models.FormTemplate).values(is_current=False))
+
+#     # Set the specified template as current
+#     db_template.is_current = set_current.is_current
+
+#     db.commit()
+#     db.refresh(db_template)
+#     return db_template

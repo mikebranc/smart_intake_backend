@@ -126,3 +126,6 @@ class Thread(ThreadBase):
 
     class Config:
         orm_mode = True
+
+class SetCurrentTemplate(BaseModel):
+    is_current: bool = True
